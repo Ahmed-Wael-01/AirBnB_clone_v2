@@ -1,29 +1,30 @@
 #!/usr/bin/python3
-"""do packing"""
-from fabric.api import *
+"""
+Fabric script based on the file 1-pack_web_static.py that distributes an
+archive to the web servers
+"""
+
+from fabric.api import put, run, env
 from os.path import exists
-env.hosts = ['54.209.62.255', '52.23.179.43']
+env.hosts = ['142.44.167.228', '144.217.246.195']
 
 
 def do_deploy(archive_path):
-    """packing stuff"""
+    """distributes an archive to the web servers"""
     if exists(archive_path) is False:
         return False
     try:
-        zfile = archive_path.split('/')[-1]
-        unexe = zfile.split('.')[0]
+        file_n = archive_path.split("/")[-1]
+        no_ext = file_n.split(".")[0]
+        path = "/data/web_static/releases/"
         put(archive_path, '/tmp/')
-        run('mkdir -p {}{}/'.format('/data/web_static/releases/', unexe))
-        run('tar -xzf /tmp/{} -C {}{}/'.format(
-                    zfile, '/data/web_static/releases/', unexe))
-        run('rm /tmp/{}'.format(zfile))
-        run('mv {0}{1}/web_static/* {0}{1}/'.format(
-            '/data/web_static/releases/', unexe))
-        run('rm -rf {}{}/web_static'.format(
-            '/data/web_static/releases/', unexe))
+        run('mkdir -p {}{}/'.format(path, no_ext))
+        run('tar -xzf /tmp/{} -C {}{}/'.format(file_n, path, no_ext))
+        run('rm /tmp/{}'.format(file_n))
+        run('mv {0}{1}/web_static/* {0}{1}/'.format(path, no_ext))
+        run('rm -rf {}{}/web_static'.format(path, no_ext))
         run('rm -rf /data/web_static/current')
-        run('ln -s {}{}/ /data/web_static/current'.format(
-            '/data/web_static/releases/', unexe))
+        run('ln -s {}{}/ /data/web_static/current'.format(path, no_ext))
         return True
-    except Exception as e:
+    except:
         return False
