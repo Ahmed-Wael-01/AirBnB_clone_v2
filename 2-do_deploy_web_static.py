@@ -1,32 +1,29 @@
 #!/usr/bin/python3
-"""
-Fabric script that distributes an archive to your web servers,
-using the function do_deploy
-"""
-from fabric.api import local, put, run, env, sudo
-from datetime import datetime
-from os import path
-
+"""do packing"""
+from fabric.api import *
+from os.path import exists
 env.hosts = ['54.209.62.255', '52.23.179.43']
 
 
 def do_deploy(archive_path):
-    """Function to deploy"""
-    if not path.exists(archive_path):
+    """packing stuff"""
+    if exists(archive_path) is False:
         return False
     try:
-        put(archive_path, "/tmp/")
-        name = archive_path.split('/')[1].split('.')[0]
-        sudo("mkdir -p /data/web_static/releases/{}/".format(name))
-        sudo("tar -xzf /tmp/{}.tgz -C /data/web_static/releases/{}/"
-             .format(name, name))
-        run("rm /tmp/{}.tgz".format(name))
-        sudo("mv /data/web_static/releases/{}/web_static/*\
-             /data/web_static/releases/{}/".format(name, name))
-        sudo("rm -rf /data/web_static/releases/{}/web_static".format(name))
-        sudo("rm -rf /data/web_static/current")
-        sudo("ln -s /data/web_static/releases/{}/ /data/web_static/current"
-             .format(name))
+        zfile = archive_path.split('/')[-1]
+        unexe = zfile.split('.')[0]
+        put(archive_path, '/tmp/')
+        sudo('mkdir -p {}{}/'.format('/data/web_static/releases/', unexe))
+        sudo('tar -xzf /tmp/{} -C {}{}/'.format(
+                    zfile, '/data/web_static/releases/', unexe))
+        sudo('rm /tmp/{}'.format(zfile))
+        sudo('mv {0}{1}/web_static/* {0}{1}/'.format(
+            '/data/web_static/releases/', unexe))
+        sudo('rm -rf {}{}/web_static'.format(
+            '/data/web_static/releases/', unexe))
+        sudo('rm -rf /data/web_static/current')
+        sudo('ln -s {}{}/ /data/web_static/current'.format(
+            '/data/web_static/releases/', unexe))
         return True
-    except Exception:
+    except Exception as e:
         return False
