@@ -17,7 +17,9 @@ def do_deploy(archive_path):
         sudo('tar -xzf /tmp/{} -C {}{}/'.format(
                     zfile, '/data/web_static/releases/', unexe))
         sudo('rm /tmp/{}'.format(zfile))
-        sudo('mv {0}{1}/web_static/* {0}{1}/'.format(
+        sudo('rsync -a {0}{1}/web_static/ {0}{1}/'.format(
+            '/data/web_static/releases/', unexe))
+        sudo('rm -rf {0}{1}/web_static/*'.format(
             '/data/web_static/releases/', unexe))
         sudo('rm -rf {}{}/web_static'.format(
             '/data/web_static/releases/', unexe))
