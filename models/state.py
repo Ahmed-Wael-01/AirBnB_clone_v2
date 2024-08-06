@@ -12,3 +12,13 @@ class State(BaseModel, Base):
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
     cities = relationship("City", backref="state")
+    if models.storage_t != "db":
+        @property
+        def cities(self):
+            """gets all cities linked to state"""
+            linked_city = []
+            cities = model.storage.all(City)
+            for city in cities.values():
+                if city.state_id == self.id:
+                    linked_city.append(city)
+            return linked_city
