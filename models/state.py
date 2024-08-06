@@ -9,9 +9,13 @@ from sqlalchemy.orm import relationship
 
 class State(BaseModel, Base):
     """ State class """
-    __tablename__ = "states"
-    name = Column(String(128), nullable=False)
-    cities = relationship("City", backref="state")
+    if models.storage_t == "db":
+        __tablename__ = "states"
+        name = Column(String(128), nullable=False)
+        cities = relationship("City", backref="state")
+    else:
+        name = ""
+
     if models.storage_t != "db":
         @property
         def cities(self):
