@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 
 @app.teardown_appcontext
-def tearit():
+def tearit(e):
     """closes session after each request"""
     storage.close()
 
